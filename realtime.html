@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <meta charset = 'utf-8'>
+    <head>
+        <title> Real time info</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script src='/socket.io/socket.io.js'></script>
+        <script src="js/jquery.js"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                // Timer
+                function updateTime() {
+                    var now = new Date();
+                    $('#date').text(now.toString())       
+                }
+                updateTime()
+                setInterval(updateTime, 1000); // 1 * 1000 miliseconds
+
+                //connect websocket               
+                socket = io.connect(document.location.href)
+
+                //Start Scan
+                $('#start_scan').click(function(){
+                    //Clear data
+                    $('.data_row').remove()   
+                    var counter = 0
+                                        
+                    var params={}
+                    params.time=$('#input_time').val()
+                    params.db_check=$('#database_check').prop('checked')
+                    socket.emit('start_scan',params)
+                    //Enable stop scan button
+                    $('#stop_scan').prop("disabled",false)
+                    //Handle events
+
+                    socket.on('bt',function(device){
+                        var new_record = $('<tr class="data_row"><td>'+device.mac.toUpperCase()+'</td>'
+                            + '<td>'+device.timestamp+'</td><td>'+device.name+'</td>'
+                            + '<td>'+device.device_class+'</td> <td>'+device.rssi+'</td> </tr>')
+                        new_record.hide()
+                        $('#table_records tr:last-child').after(new_record)
+                        new_record.fadeIn('fast')
+                        counter+=1
+                        $('#counter').text(counter)
+                        //$('#table_records').append(new_record)
+                    })
+
+                    socket.on('scan_stopped', function(){
+                        $('#stop_scan').prop("disabled",true)
+                        socket.removeAllListeners()
+                    })
+                })
+
+                //Stop Scan
+                $('#stop_scan').click(function(){
+                    socket.emit('stop_scan')
+                    $('#stop_scan').prop("disabled",true)
+                })
+
+                $('#clear_data').click(function(){
+                    $('.data_row').remove()
+                })
+
+            })
+        </script>
+    </head>
+
+    <body>
+        <img src="/src/bt_logo.jpg">
+        <div>
+            <p>Current time : </p>
+            <p id='date'></p>
+        </div>
+        <div>
+            <button id ='start_scan'>Start Scan</button>
+            <input  id ='input_time'type='number' min='5'  placeholder='Input inquiry time seconds' value = 0>
+            <button id ='stop_scan' disabled >Stop Scan</button>
+            <button id ='clear_data' >Clear Data</button>
+            <input  id ='database_check' type="checkbox"> Save on Database</input> <br>
+        </div>
+        <h1> Real Time Data  ----  Devices Found: <span id='counter'>0</span></h1>
+        <table id='table_records'>
+            <tr>
+                <th>MAC Address</th>
+                <th>Timestap</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Rssi</th>
+            </tr>
+        </table>   
+        <br>
+        <div>
+          <table>
+            <tr> 
+              <td><a href='/'>Config</a></td>
+              <td><a href='realtime'>Real time</a></td>
+              <td><a href='/API/records'>API</a></td> 
+            </tr>
+          </table>
+        </div> 
+    </body>
+</html>

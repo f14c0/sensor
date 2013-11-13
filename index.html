@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="js/jquery.js"></script>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfeBLaFbUOQ4eLlve3SkLkJlKUYqhRSgo&sensor=true">
+    </script>
+    
+    <title>Raspberry Pi Bluetooth Sensor</title>
+    
+    <script type="text/javascript">
+    $(document).ready(function(){
+      getConfig()
+      
+      function initialize() {
+        var sensorLatlng = new google.maps.LatLng($('#lattitude').val(),$('#longitude').val());
+        var mapOptions = {
+          scrollwheel: true,
+          navigationControl: true,
+          scaleControl: true,
+          draggable: true,
+          mapTypeControl: false,
+          center:sensorLatlng,
+          zoom: 17,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+        google.maps.event.addDomListener(window, 'load', initialize);
+        Marker = new google.maps.Marker({position:sensorLatlng,map:map})
+      }
+      
+
+      function getConfig(){
+        $.ajax({
+            url: '/config-file',
+            type: 'GET',
+            success: function (data) {
+                $.each(data, function(k, v) {
+                //display the key and value pair
+                  $('#'+k).val(v)
+                })
+                initialize()
+            },
+            error: function (xhr, status, error) {alert('Error: ' + error.message)}
+        })
+      }
+
+      $('.input_data').prop('disabled',true)
+      $('#edit_config').click(function(){
+        $('.input_data').prop('disabled',false)
+        $('#save_config').fadeIn('fast')
+      })
+
+      $('#get_config').click(function(){
+        getConfig()
+      })
+
+      $('#save_config').click(function(){
+          var new_config={}
+          $('#table_config :input').each(function(){
+            new_config[$(this).attr('id')]= $(this).val()
+          })
+          var json_to_send = JSON.stringify(new_config)
+          $.ajax({
+            url:'/config-file',
+            type:'POST',
+            dataType:'json',
+            data:json_to_send,
+            contentType:'application/json',
+            cache:false,
+            timeout: 10000,
+            conplete:function(){
+              alert('complete')
+            },
+            success:function(){
+              alert('success')
+            },
+            error:function(){
+            }
+          })
+      })
+    })
+    </script>
+
+  </head>
+  <body>
+    <img src="/src/bt_logo.jpg">
+    <h1>Raspberry Pi Bluetooth Sensor</h1>
+    <div id = "map-canvas">
+    </div>
+    <div id="config" class= "config">
+      <h2>General Config</h2>
+      <table id='table_config'>
+        <tr>
+          <td>Location ID</td>
+          <td> <input type='text' id='location_id'class='input_data'> </td>
+        </tr>
+        <tr>
+          <td>Group ID</td>
+          <td> <input type='text' id='group_id'size='5' class='input_data'> </td>
+        </tr>
+        <tr>
+          <td>Device Name</td>
+          <td> <input type='text' id='device_name' class='input_data'> </td>
+        </tr>
+        <tr>
+          <td>Device Description</td>
+          <td><textarea cols="40" id='device_description' rows="3"/ class='input_data'></textarea>  </td>
+        </tr>
+        <tr>
+          <td>Owner</td>
+          <td> <input type='text' id='owner' size='40' class='input_data'> </td>
+        </tr>
+        <tr>
+          <td>Lattitude</td>
+          <td> <input type='text' id='lattitude' class='input_data'></td>
+        </tr>
+        <tr>
+          <td>Longitude</td>
+          <td> <input type='text' id='longitude' class='input_data'></td>
+        </tr>
+        <tr>
+          <td>Altitude</td>
+          <td> <input type='text' id='altitude' class='input_data'> </td>
+        </tr>
+      </table>
+    </div> 
+    <div class= "config">
+      <button id ='get_config' >Get Config</button>
+      <button id ='edit_config' >Edit Config</button>
+      <button id ='save_config' hidden>Save Changes</button>
+    </div>
+    <br>
+    <div class= "config">
+      <table>
+        <tr> 
+          <td><a href='/'>Config</a></td>
+          <td><a href='realtime'>Real time</a></td>
+          <td><a href='/API/records'>API</a></td> 
+        </tr>
+      </table>
+    </div> 
+
+  </body>
+</html>
