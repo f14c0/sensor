@@ -3,7 +3,7 @@
 
 var mongoose 	= require('mongoose')
 var schema		= mongoose.Schema
-var db_host		= 'mongodb://f14c0:624691@paulo.mongohq.com:10090/records'
+var db_host		= 'mongodb://localhost/records'
 var config      = require('../config.json')
 
 var record_schema = new schema({
