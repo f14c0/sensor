@@ -1,10 +1,1 @@
-{
-	"location_id":"PT_CLL80",
-	"group_id":"1",
-	"device_name":"sensor uno",
-	"device_description":"Bluetooth sensor powered by rasberry pi",
-	"owner":"Universidad Católica de Colombia",
-	"lattitude":"4.709469",
-	"longitude":"-74.110556",
-	"altitude":"3600"
-}
+{"location_id":"PT_CLL80","group_id":"9","device_name":"sensor uno","device_description":"Bluetooth sensor powered by rasberry pi","owner":"Universidad Católica de Colombia","lattitude":"4.709430932630765","longitude":"-74.11050796508789","altitude":"3600"}

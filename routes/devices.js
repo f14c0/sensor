@@ -39,13 +39,17 @@ exports.init =function (app) {
   app.get('/config-file',function(req,res){
     res.writeHead(200, {'Content-Type': 'application/json'})
     var config = JSON.parse(fs.readFileSync(path.join(__dirname,'../','config.json'), 'utf8'))
+    console.log(config)
     res.end(JSON.stringify(config))
   })
 
   app.post('/config-file',function(req,res){
     console.log('post to body')
     res.writeHead(200, {'Content-Type': 'application/json'})
+    var response= {"response":"ok"}
+    res.write(JSON.stringify(response))
     res.end()
+    fs.writeFileSync("config.json", JSON.stringify(req.body));
     console.log(req.body)
   })
 }

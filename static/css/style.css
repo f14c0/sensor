@@ -53,10 +53,6 @@ tr:nth-child(odd) td { background: #FEFEFE; }
 
 tr td:hover { background: #666; color: #FFF; } /* Hover cell effect! */
 
-div{
-	border: 1px solid transparent;
-	width: 700px;
-}
 
 div.config{
   background-color: #DFDFDF;
@@ -66,7 +62,7 @@ div.config{
 #map-canvas { 
   float: right;
   width:485px;
-  height: 428px; 
+  height: 420px; 
   margin: 2px
 }
 

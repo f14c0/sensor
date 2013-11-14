@@ -8,18 +8,31 @@
       #map-canvas { height: 100% }
     </style>
     <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA40lsKsfZrSPqULdIf-kS6hcIjqrEtYXw&sensor=true">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCfeBLaFbUOQ4eLlve3SkLkJlKUYqhRSgo&sensor=true">
     </script>
     <script type="text/javascript">
       function initialize() {
+        var sensorLatlng = new google.maps.LatLng(70.2560,70.2560);
         var mapOptions = {
-          center: new google.maps.LatLng(-34.397, 150.644),
-          zoom: 8,
+          center:sensorLatlng,
+          zoom: 17,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         var map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
+        Marker = new google.maps.Marker({position:sensorLatlng,map:map})
+        //Enable Map listener
+        google.maps.event.addListener(map, 'click', function(e) {
+    placeMarker(e.latLng, map);
+  })
       }
+        function placeMarker(position, map) {
+  var marker = new google.maps.Marker({
+    position: position,
+    map: map
+  });
+  map.panTo(position);
+}
       google.maps.event.addDomListener(window, 'load', initialize);
     </script>
   </head>

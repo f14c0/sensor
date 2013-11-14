@@ -11,28 +11,44 @@
     <title>Raspberry Pi Bluetooth Sensor</title>
     
     <script type="text/javascript">
-    $(document).ready(function(){
-      getConfig()
-      
-      function initialize() {
-        var sensorLatlng = new google.maps.LatLng($('#lattitude').val(),$('#longitude').val());
+    var current_marker
+    var config_editable =false
+    function initialize() {
+        var sensorLatlng = new google.maps.LatLng($('#lattitude').val(),$('#longitude').val())
         var mapOptions = {
-          scrollwheel: true,
-          navigationControl: true,
-          scaleControl: true,
-          draggable: true,
-          mapTypeControl: false,
           center:sensorLatlng,
           zoom: 17,
           mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
+        }
         var map = new google.maps.Map(document.getElementById("map-canvas"),
-            mapOptions);
-        google.maps.event.addDomListener(window, 'load', initialize);
-        Marker = new google.maps.Marker({position:sensorLatlng,map:map})
-      }
-      
+            mapOptions)
+        current_marker = new google.maps.Marker({position:sensorLatlng,map:map})
+        
+        google.maps.event.addListener(map, 'click', 
+        function(e) {
+          if (config_editable){
+            placeMarker(e.latLng, map, current_marker)
+          }
+        })
+        
+    }
+    function placeMarker(position, map, old_marker) {
+      current_marker.setMap(null)
+      var marker = new google.maps.Marker(
+      {
+        position: position,
+        map: map
+      })
+      current_marker=marker
+      map.panTo(position);
 
+      $('#lattitude').val(position.lat())
+      $('#longitude').val(position.lng())
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+    $(document).ready(function(){
+      getConfig()
+          
       function getConfig(){
         $.ajax({
             url: '/config-file',
@@ -47,17 +63,16 @@
             error: function (xhr, status, error) {alert('Error: ' + error.message)}
         })
       }
-
       $('.input_data').prop('disabled',true)
       $('#edit_config').click(function(){
+        //Enable inputs
         $('.input_data').prop('disabled',false)
         $('#save_config').fadeIn('fast')
+        config_editable=true;
       })
-
       $('#get_config').click(function(){
         getConfig()
       })
-
       $('#save_config').click(function(){
           var new_config={}
           $('#table_config :input').each(function(){
@@ -72,13 +87,14 @@
             contentType:'application/json',
             cache:false,
             timeout: 10000,
-            conplete:function(){
-              alert('complete')
+            conplete:function(XMLHttpRequest, textStatus, errorThrown){
+              alert('complete status:' + XMLHttpRequest.status + ', status text: ' + XMLHttpRequest.statusText)
             },
-            success:function(){
-              alert('success')
+            success:function(XMLHttpRequest, textStatus, errorThrown){
+              alert('Configuracion modificada satisfactoriamente')
             },
-            error:function(){
+            error:function(XMLHttpRequest, textStatus, errorThrown){
+            alert('error status:' + XMLHttpRequest.status + ', status text: ' + XMLHttpRequest.statusText)
             }
           })
       })
